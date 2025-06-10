@@ -12,7 +12,7 @@ contract CounterScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        gearcoin = new GearCoin('TOKEN', 'TK', 6);
+        gearcoin = new GearCoin('TOKEN', 'TK');
 
         vm.stopBroadcast();
     }

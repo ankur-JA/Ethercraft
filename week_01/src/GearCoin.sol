@@ -1,13 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-contract GearCoin {
-    string _name;
-    string _symbol;
-    uint8 _decimals;
+/**
+  * @title GearCoin
+  * @dev Simple ERC20-compliant token implementation with mint and burn functionality.
+*/
 
+contract GearCoin {
+    // Token name
+    string _name;
+
+    // Token symbol
+    string _symbol;
+
+    //  Token decimals (fixed to 18)
+    uint8 constant _decimals = 18;
+
+    // Total token supply
     uint256 _totalSupply;
 
+    // Owner address (has permission to mint new tokens)
     address owner;
 
     mapping (address => uint256) balances;
@@ -24,10 +36,9 @@ contract GearCoin {
     }
     
 
-    constructor (string memory name_, string memory symbol_, uint8 decimals_) {
+    constructor (string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        _decimals = decimals_;
         owner = msg.sender;
     }
 
@@ -39,79 +50,71 @@ contract GearCoin {
         return _symbol;
     }
 
-    function decimals() public view returns (uint8) {
+    function decimals() public pure returns (uint8) {
         return _decimals;
     }
 
-    function totolSupply() public view returns (uint256) {
+    function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 
-    function balanceOf(address _owner) public view returns (uint256 balance) {
-        balance = balances[_owner];
-        return balance;
+    function balanceOf(address _owner) public view returns (uint256) {
+        return balances[_owner];
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success){
+    function transfer(address _to, uint256 _value) public returns (bool){
         require(balances[msg.sender] >= _value, "Not enough token!");
 
         balances[msg.sender] -= _value;
         balances[_to] += _value;
 
-        success = true;
-
         emit Transfer(msg.sender, _to, _value);
 
-        return success;
+        return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(allowances[_from][msg.sender] >= _value, "Not enough token!");
+        require(balances[_from] >= _value, "Not enough Token");
 
         balances[_from] -= _value;
         balances[_to] += _value;
 
-        success = true;
+        allowances[_from][msg.sender] -= _value;
 
-        return success;
+        emit Transfer(_from, _to, _value);
+
+        return true;
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool success) {
+    function approve(address _spender, uint256 _value) public returns (bool) {
         allowances[msg.sender][_spender] = _value;
-
-        success = true;
         
         emit Approval(msg.sender, _spender, _value);
 
-        return success;
+        return true;
     }
 
     function allowance(address _owner, address _spender) public view returns(uint256) {
-        uint256 balance = allowances[_owner][_spender];
-
-        return balance;
+        return allowances[_owner][_spender];
     }
 
-    function mint(address _to, uint256 _value) public onlyOwner returns (bool success) {
+    function mint(address _to, uint256 _value) public onlyOwner returns (bool) {
         balances[_to] += _value;
 
         _totalSupply += _value;
 
-        success = true;
-
-        return success;
+        return true;
 
     }
 
-    function burn(uint256 _value) public returns (bool success) {
+    function burn(uint256 _value) public returns (bool) {
         require(balances[msg.sender] >= _value, "You don't have the token!");
 
         balances[msg.sender] -= _value;
 
         _totalSupply -= _value;
 
-        success = true;
-
-        return success;
+        return true;
     }
 }
