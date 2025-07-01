@@ -13,7 +13,7 @@ contract TestGas is Test {
         gas = new Gas();
     }
 
-    function test_forever() public {
+    function test_forever() public view {
         //gas.forever();
         assertEq(gas.i(), 0);
     }
